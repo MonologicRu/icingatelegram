@@ -242,7 +242,9 @@ bot.on(/^\/report_(.+)_(.+)$/, async (msg, props) => {
     try {
         let monitoringData = await getCheckResult( serviceCode );
         if (monitoringData.length > messageLimit) {
+            console.log(monitoringData.length);
             for (const line of monitoringData.split('\n')) {
+                console.log(currentChunk);
                 currentChunk = currentChunk + line + '\n';
                 if (currentChunk.length >= messageLimit) {
                     notificationData.push(currentChunk);
