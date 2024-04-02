@@ -39,6 +39,12 @@ const ifString = config.get('interface');
 // set default language
 const defaultLang = config.get('defaults.defaultLang');
 
+// set TG message size limit
+const messageLimit = config.get('telegram.maxMessageSize');
+
+// set TG message size limit
+const messageDelay = config.get('telegram.messageDelay');
+
 // initiate node.telebot
 const bot = new TeleBot({
     token: config.get('telegram.token'),    // Required. Telegram Bot API token.
@@ -223,28 +229,71 @@ bot.on(/^\/report_(.+)_(.+)$/, async (msg, props) => {
     let serviceCode = monitoring.service[ originId ][ serviceId ]['endpoint'];
     let serviceLabel = monitoring.service[ originId ][ serviceId ]['name'][ defaultLang ];
 
-    if (returnButtonEnabled) { 
-        let returnButton = bot.inlineButton( ifString["button_return"][ defaultLang ], { callback: '/tellme_' + sessionId } );
-        buttons.push( [ returnButton ] );
-        replyMarkup = bot.inlineKeyboard( buttons, { once: true } );
-    }
-
+    let notificationData = [];
+    let currentChunk = '';
     try {
         let monitoringData = await getCheckResult( serviceCode );
-        message = ifString["text_report_header"][ defaultLang ];
-        message = message.replace(/CHATTITLE/g, chatTitle );
-        message = message.replace(/SERVICELABEL/g, serviceLabel );
-        message = message.replace(/REPORT/g, monitoringData );
+        if (monitoringData.length > messageLimit) {
+            for (const line of monitoringData.split('\n')) {
+                if ( ( currentChunk + line + '\n').length >= messageLimit) {
+                    notificationData.push(currentChunk);
+                    currentChunk = line + '\n';
+                } else {
+                    currentChunk = currentChunk + line + '\n';
+                }
+            }
+            notificationData.push(currentChunk);
+        } else {
+            notificationData.push(monitoringData);
 
+        }
     } catch (e) {
         if (verbose) { console.log(e) };
-        message = ifString["request_failed"][ defaultLang ];
+        return bot.sendMessage( msg.from.id, ifString["request_failed"][ defaultLang ], { replyMarkup, parseMode} ).then (re => {
+            // set update message trail
+            lastMessage[sessionId] = [ msg.from.id, re.message_id ];
+        });
     }
 
-    return bot.sendMessage( msg.from.id, message, { replyMarkup, parseMode} ).then (re => {
-		// set update message trail
-		lastMessage[sessionId] = [ msg.from.id, re.message_id ];
-	});
+    let sendTimeout = 0; let index = 1;
+    for (const notification of notificationData) {
+        let pageWidget = ''; replyMarkup = {};
+
+        if (notificationData.length > 1) {
+            pageWidget = ifString["text_page_widget"][ defaultLang ];
+            pageWidget = pageWidget.replace(/PAGE/g, index.toString() );
+            pageWidget = pageWidget.replace(/TOTAL/g, notificationData.length.toString() );
+        }
+        
+        if ( index == notificationData.length && returnButtonEnabled) {
+            let returnButton = bot.inlineButton( ifString["button_return"][ defaultLang ], { callback: '/tellme_' + sessionId } );
+            buttons.push( [ returnButton ] );
+            replyMarkup = bot.inlineKeyboard( buttons, { once: true } );
+        }
+        setTimeout( (notificationConfig) => {
+            let message = ifString["text_report_header"][ defaultLang ];
+            message = message.replace(/CHATTITLE/g, notificationConfig.chat_title );
+            message = message.replace(/SERVICELABEL/g, notificationConfig.service_label );
+            message = message.replace(/REPORT/g, notificationConfig.notification );
+            message = message.replace(/PAGE/g, notificationConfig.page_widget );
+            bot.sendMessage( notificationConfig.userid, message, notificationConfig.msg_config ).then (re => {
+                // set update message trail
+                lastMessage[notificationConfig.session_id] = [ notificationConfig.userid, re.message_id ];
+            });
+        }, sendTimeout, {
+            'chat_title': chatTitle,
+            'service_label': serviceLabel,
+            'notification': notification,
+            'userid': msg.from.id,
+            'msg_config': { replyMarkup, parseMode },
+            'session_id': sessionId,
+            'page_widget': pageWidget
+
+        });
+        sendTimeout = sendTimeout + messageDelay;
+        index++;
+    }
+
 });
 
 // Button click callback handler
@@ -265,6 +314,10 @@ bot.on('callbackQuery', (msg) => {
 	}
 });
 
+function paginateOutput( paginateConfig ) {
+
+
+}
 
 function generateOptions( serviceObject, sessionId) {
     let buttons = [];
