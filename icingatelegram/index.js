@@ -314,11 +314,6 @@ bot.on('callbackQuery', (msg) => {
 	}
 });
 
-function paginateOutput( paginateConfig ) {
-
-
-}
-
 function generateOptions( serviceObject, sessionId) {
     let buttons = [];
     let serviceList = Object.keys( serviceObject );
