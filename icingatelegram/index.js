@@ -261,7 +261,7 @@ bot.on(/^\/report_(.+)_(.+)$/, async (msg, props) => {
         });
     }
 
-    let sendTimeout = 0; let index = 0;
+    let sendTimeout = 0; let index = 1;
     for (const notification of notificationData) {
         console.log('index: ' + index + ' array len: ' + notificationData.length + ' switch: ' + returnButtonEnabled);
         if ( index == notificationData.length && returnButtonEnabled) {
