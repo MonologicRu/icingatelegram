@@ -251,6 +251,7 @@ bot.on(/^\/report_(.+)_(.+)$/, async (msg, props) => {
                     currentChunk = '';
                 }
             }
+            notificationData.push(currentChunk);
         } else {
             notificationData.push(monitoringData);
         }
