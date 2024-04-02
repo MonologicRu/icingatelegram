@@ -279,7 +279,7 @@ bot.on(/^\/report_(.+)_(.+)$/, async (msg, props) => {
             message = message.replace(/REPORT/g, notificationConfig.notification );
             bot.sendMessage( notificationConfig.userid, message, notificationConfig.msg_config ).then (re => {
                 // set update message trail
-                lastMessage[notificationConfig.session_id] = [ notificationConfig.userid, notificationConfig.message_id ];
+                lastMessage[notificationConfig.session_id] = [ notificationConfig.userid, re.message_id ];
             });
         }, sendTimeout, {
             'chat_title': chatTitle,
@@ -287,8 +287,7 @@ bot.on(/^\/report_(.+)_(.+)$/, async (msg, props) => {
             'notification': notification,
             'userid': msg.from.id,
             'msg_config': { replyMarkup, parseMode },
-            'session_id': sessionId,
-            'message_id': re.message_id
+            'session_id': sessionId
 
         });
         sendTimeout = sendTimeout + messageDelay;
