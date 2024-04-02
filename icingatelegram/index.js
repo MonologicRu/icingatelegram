@@ -39,6 +39,12 @@ const ifString = config.get('interface');
 // set default language
 const defaultLang = config.get('defaults.defaultLang');
 
+// set TG message size limit
+const messageLimit = config.get('telegram.maxMessageSize');
+
+// set TG message size limit
+const messageDelay = config.get('telegram.messageDelay');
+
 // initiate node.telebot
 const bot = new TeleBot({
     token: config.get('telegram.token'),    // Required. Telegram Bot API token.
@@ -223,28 +229,84 @@ bot.on(/^\/report_(.+)_(.+)$/, async (msg, props) => {
     let serviceCode = monitoring.service[ originId ][ serviceId ]['endpoint'];
     let serviceLabel = monitoring.service[ originId ][ serviceId ]['name'][ defaultLang ];
 
+    /*
     if (returnButtonEnabled) { 
         let returnButton = bot.inlineButton( ifString["button_return"][ defaultLang ], { callback: '/tellme_' + sessionId } );
         buttons.push( [ returnButton ] );
         replyMarkup = bot.inlineKeyboard( buttons, { once: true } );
     }
+    */
 
+    let notificationData = [];
+    let currentChunk = '';
     try {
         let monitoringData = await getCheckResult( serviceCode );
-        message = ifString["text_report_header"][ defaultLang ];
-        message = message.replace(/CHATTITLE/g, chatTitle );
-        message = message.replace(/SERVICELABEL/g, serviceLabel );
-        message = message.replace(/REPORT/g, monitoringData );
-
+        if (monitoringData.length > messageLimit) {
+            for (const line of monitoringData.split('\n')) {
+                currentChunk = currentChunk + line + '\n';
+                if (currentChunk.length >= messageLimit) {
+                    notificationData.push(currentChunk);
+                    currentChunk = '';
+                }
+            }
+        } else {
+            notificationData.push(monitoringData);
+        }
+        console.log(notificationData);
     } catch (e) {
         if (verbose) { console.log(e) };
-        message = ifString["request_failed"][ defaultLang ];
+        return bot.sendMessage( msg.from.id, ifString["request_failed"][ defaultLang ], { replyMarkup, parseMode} ).then (re => {
+            // set update message trail
+            lastMessage[sessionId] = [ msg.from.id, re.message_id ];
+        });
     }
 
-    return bot.sendMessage( msg.from.id, message, { replyMarkup, parseMode} ).then (re => {
-		// set update message trail
-		lastMessage[sessionId] = [ msg.from.id, re.message_id ];
-	});
+    let sendTimeout = 0; let index = 0;
+    for (const notification of notificationData) {
+        if ( index === notificationData.length && returnButtonEnabled) {
+            let returnButton = bot.inlineButton( ifString["button_return"][ defaultLang ], { callback: '/tellme_' + sessionId } );
+            buttons.push( [ returnButton ] );
+            replyMarkup = bot.inlineKeyboard( buttons, { once: true } );
+        } else {
+            replyMarkup = {};
+        }
+        setTimeout( (notificationConfig) => {
+            console.log(notificationConfig);
+
+            let message = ifString["text_report_header"][ defaultLang ];
+            message = message.replace(/CHATTITLE/g, notificationConfig.chat_title );
+            message = message.replace(/SERVICELABEL/g, notificationConfig.service_label );
+            message = message.replace(/REPORT/g, notificationConfig.notification );
+            bot.sendMessage( notificationConfig.userid, message, notificationConfig.msg_config ).then (re => {
+                // set update message trail
+                lastMessage[notificationConfig.session_id] = [ notificationConfig.userid, notificationConfig.message_id ];
+            });
+        }, sendTimeout, {
+            'chat_title': chatTitle,
+            'service_label': serviceLabel,
+            'notification': notification,
+            'userid': msg.from.id,
+            'msg_config': { replyMarkup, parseMode },
+            'session_id': sessionId,
+            'message_id': re.message_id
+
+        });
+        sendTimeout = sendTimeout + messageDelay;
+        index++;
+    }
+
+    /*
+    let message = ifString["text_report_header"][ defaultLang ];
+    message = message.replace(/CHATTITLE/g, chatTitle );
+    message = message.replace(/SERVICELABEL/g, serviceLabel );
+    message = message.replace(/REPORT/g, notification );
+    bot.sendMessage( msg.from.id, message, {replyMarkup, parseMode} ).then (re => {
+        // set update message trail
+        lastMessage[sessionId] = [ msg.from.id, re.message_id ];
+    });
+    */
+
+
 });
 
 // Button click callback handler
@@ -265,6 +327,10 @@ bot.on('callbackQuery', (msg) => {
 	}
 });
 
+function paginateOutput( paginateConfig ) {
+
+
+}
 
 function generateOptions( serviceObject, sessionId) {
     let buttons = [];
