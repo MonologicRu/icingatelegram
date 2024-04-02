@@ -242,9 +242,7 @@ bot.on(/^\/report_(.+)_(.+)$/, async (msg, props) => {
     try {
         let monitoringData = await getCheckResult( serviceCode );
         if (monitoringData.length > messageLimit) {
-            console.log(monitoringData.length);
             for (const line of monitoringData.split('\n')) {
-                console.log(currentChunk);
                 currentChunk = currentChunk + line + '\n';
                 if (currentChunk.length >= messageLimit) {
                     notificationData.push(currentChunk);
@@ -254,8 +252,8 @@ bot.on(/^\/report_(.+)_(.+)$/, async (msg, props) => {
             notificationData.push(currentChunk);
         } else {
             notificationData.push(monitoringData);
+
         }
-        console.log(notificationData);
     } catch (e) {
         if (verbose) { console.log(e) };
         return bot.sendMessage( msg.from.id, ifString["request_failed"][ defaultLang ], { replyMarkup, parseMode} ).then (re => {
@@ -266,22 +264,26 @@ bot.on(/^\/report_(.+)_(.+)$/, async (msg, props) => {
 
     let sendTimeout = 0; let index = 1;
     for (const notification of notificationData) {
-        console.log('index: ' + index + ' array len: ' + notificationData.length + ' switch: ' + returnButtonEnabled);
+        // console.log('index: ' + index + ' array len: ' + notificationData.length + ' switch: ' + returnButtonEnabled);
+        let pageWidget = ''; replyMarkup = {};
+
+        if (notificationData.length > 1) {
+            pageWidget = ifString["text_page_widget"][ defaultLang ];
+            pageWidget = pageWidget.replace(/PAGE/g, index.toString() );
+            pageWidget = pageWidget.replace(/TOTAL/g, notificationData.length.toString() );
+        }
+        
         if ( index == notificationData.length && returnButtonEnabled) {
             let returnButton = bot.inlineButton( ifString["button_return"][ defaultLang ], { callback: '/tellme_' + sessionId } );
             buttons.push( [ returnButton ] );
             replyMarkup = bot.inlineKeyboard( buttons, { once: true } );
-            console.log(replyMarkup);
-        } else {
-            replyMarkup = {};
         }
         setTimeout( (notificationConfig) => {
-            console.log(notificationConfig);
-
             let message = ifString["text_report_header"][ defaultLang ];
             message = message.replace(/CHATTITLE/g, notificationConfig.chat_title );
             message = message.replace(/SERVICELABEL/g, notificationConfig.service_label );
             message = message.replace(/REPORT/g, notificationConfig.notification );
+            message = message.replace(/PAGE/g, notificationConfig.page_widget );
             bot.sendMessage( notificationConfig.userid, message, notificationConfig.msg_config ).then (re => {
                 // set update message trail
                 lastMessage[notificationConfig.session_id] = [ notificationConfig.userid, re.message_id ];
@@ -292,7 +294,8 @@ bot.on(/^\/report_(.+)_(.+)$/, async (msg, props) => {
             'notification': notification,
             'userid': msg.from.id,
             'msg_config': { replyMarkup, parseMode },
-            'session_id': sessionId
+            'session_id': sessionId,
+            'page_widget': pageWidget
 
         });
         sendTimeout = sendTimeout + messageDelay;

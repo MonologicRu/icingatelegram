@@ -39,6 +39,10 @@
             "en": " ↪  Return back",
             "ru": " ↪  Вернуться назад"
         },
+        "text_page_widget": {
+            "en": "\n(part PAGE of TOTAL)",
+            "ru": "\n(часть PAGE из TOTAL)"
+        },
         "session_expired": {
             "en": " ⚠️  Button expired, repeat your request from the origin group!",
             "ru": " ⚠️  Кнопка устарела, повторите запрос из группы!"
@@ -68,8 +72,8 @@
             "ru": "<b> 💠   CHATTITLE</b>\nUSERNAME укажите раздел мониторинга для запроса информации:"
         },
         "text_report_header": {
-            "en": "<b> 💠   CHATTITLE</b>\n<i>SERVICELABEL</i>\n\nThis is what I do observe now: <pre>REPORT</pre>",
-            "ru": "<b> 💠   CHATTITLE</b>\n<i>SERVICELABEL</i>\n\nТакую ситуацию наблюдаю я сейчас: <pre>REPORT</pre>"
+            "en": "<b> 💠   CHATTITLE</b>\n<i>SERVICELABEL</i>\n\nThis is what I do observe now: PAGE<pre>REPORT</pre>",
+            "ru": "<b> 💠   CHATTITLE</b>\n<i>SERVICELABEL</i>\n\nТакую ситуацию наблюдаю я сейчас: PAGE<pre>REPORT</pre>"
         },
         "image_report_caption": {
             "en": " 💠   CHATTITLE \n SERVICELABEL",
