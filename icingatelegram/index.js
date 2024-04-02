@@ -263,10 +263,12 @@ bot.on(/^\/report_(.+)_(.+)$/, async (msg, props) => {
 
     let sendTimeout = 0; let index = 0;
     for (const notification of notificationData) {
-        if ( index === notificationData.length && returnButtonEnabled) {
+        console.log('index: ' + index + ' array len: ' + notificationData.length + ' switch: ' + returnButtonEnabled);
+        if ( index == notificationData.length && returnButtonEnabled) {
             let returnButton = bot.inlineButton( ifString["button_return"][ defaultLang ], { callback: '/tellme_' + sessionId } );
             buttons.push( [ returnButton ] );
             replyMarkup = bot.inlineKeyboard( buttons, { once: true } );
+            console.log(replyMarkup);
         } else {
             replyMarkup = {};
         }
