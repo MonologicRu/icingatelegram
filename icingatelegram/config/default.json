@@ -16,7 +16,7 @@
 		"key": "",
 		"cert": "",
         "maxConnections": "30",
-        "maxMessageSize": 2000,
+        "maxMessageSize": 4000,
         "messageDelay": 1000
     },
     "defaults": {

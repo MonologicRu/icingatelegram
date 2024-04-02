@@ -229,24 +229,17 @@ bot.on(/^\/report_(.+)_(.+)$/, async (msg, props) => {
     let serviceCode = monitoring.service[ originId ][ serviceId ]['endpoint'];
     let serviceLabel = monitoring.service[ originId ][ serviceId ]['name'][ defaultLang ];
 
-    /*
-    if (returnButtonEnabled) { 
-        let returnButton = bot.inlineButton( ifString["button_return"][ defaultLang ], { callback: '/tellme_' + sessionId } );
-        buttons.push( [ returnButton ] );
-        replyMarkup = bot.inlineKeyboard( buttons, { once: true } );
-    }
-    */
-
     let notificationData = [];
     let currentChunk = '';
     try {
         let monitoringData = await getCheckResult( serviceCode );
         if (monitoringData.length > messageLimit) {
             for (const line of monitoringData.split('\n')) {
-                currentChunk = currentChunk + line + '\n';
-                if (currentChunk.length >= messageLimit) {
+                if ( ( currentChunk + line + '\n').length >= messageLimit) {
                     notificationData.push(currentChunk);
-                    currentChunk = '';
+                    currentChunk = line + '\n';
+                } else {
+                    currentChunk = currentChunk + line + '\n';
                 }
             }
             notificationData.push(currentChunk);
@@ -264,7 +257,6 @@ bot.on(/^\/report_(.+)_(.+)$/, async (msg, props) => {
 
     let sendTimeout = 0; let index = 1;
     for (const notification of notificationData) {
-        // console.log('index: ' + index + ' array len: ' + notificationData.length + ' switch: ' + returnButtonEnabled);
         let pageWidget = ''; replyMarkup = {};
 
         if (notificationData.length > 1) {
@@ -301,18 +293,6 @@ bot.on(/^\/report_(.+)_(.+)$/, async (msg, props) => {
         sendTimeout = sendTimeout + messageDelay;
         index++;
     }
-
-    /*
-    let message = ifString["text_report_header"][ defaultLang ];
-    message = message.replace(/CHATTITLE/g, chatTitle );
-    message = message.replace(/SERVICELABEL/g, serviceLabel );
-    message = message.replace(/REPORT/g, notification );
-    bot.sendMessage( msg.from.id, message, {replyMarkup, parseMode} ).then (re => {
-        // set update message trail
-        lastMessage[sessionId] = [ msg.from.id, re.message_id ];
-    });
-    */
-
 
 });
 
