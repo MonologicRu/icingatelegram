@@ -263,7 +263,7 @@ bot.on(/^\/report_(.+)_(.+)$/, async (msg, props) => {
             pageWidget = ifString["text_page_widget"][ defaultLang ];
             pageWidget = pageWidget.replace(/PAGE/g, index.toString() );
             pageWidget = pageWidget.replace(/TOTAL/g, notificationData.length.toString() );
-	    pageWidget = pageWidget.replace(/CREDIT/g, '' );
+	    pageWidget = pageWidget.replace(/CREDITNOTES/g, '' );
         }
         
         if ( index == notificationData.length && returnButtonEnabled) {
