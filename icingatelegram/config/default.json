@@ -39,6 +39,14 @@
             "en": " ↪  Return back",
             "ru": " ↪  Вернуться назад"
         },
+        "button_help": {
+			"en": "🛟 Help",
+			"ru": "🛟 Помощь"
+        },
+        "button_language": {
+			"en": "💭  Language",
+			"ru": "💭  Язык"
+        },
         "text_page_widget": {
             "en": "\n(part PAGE of TOTAL)",
             "ru": "\n(часть PAGE из TOTAL)"
