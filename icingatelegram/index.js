@@ -344,6 +344,7 @@ function getCheckResult( servicePath ) {
             }
         }).then(res => res.json())
         .then(callback => {
+            if (verbose) { console.log(callback) };
             let checkResult = callback.results[0].attrs.last_check_result.output.replace(/[\<\>]/g, '');
             resolve (checkResult);
         }).catch(function() {
