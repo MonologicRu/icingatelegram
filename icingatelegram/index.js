@@ -30,6 +30,9 @@ const verbose = config.get('defaults.verbose');
 // binary switch - enable return button
 const returnButtonEnabled = config.get('defaults.return-button');
 
+// binary switch - enable group confirmation message
+const confirmationEnabled = config.get('defaults.confirmation');
+
 // load monitoring configuration object
 const monitoring = config.get('monitoring');
 
