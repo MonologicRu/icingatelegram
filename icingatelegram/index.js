@@ -171,9 +171,9 @@ bot.on(/^\/tellme_(.+)/, (msg, props) => {
     message = message.replace(/USERNAME/g, callName );
 
     return bot.sendMessage( msg.from.id, message, {replyMarkup, parseMode}).then (re => {
-		// set update message trail
-		lastMessage[sessionId] = [ msg.from.id, re.message_id ];
-	});
+	// set update message trail
+	lastMessage[sessionId] = [ msg.from.id, re.message_id ];
+    });
 
 });
 
