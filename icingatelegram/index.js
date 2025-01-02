@@ -30,6 +30,9 @@ const verbose = config.get('defaults.verbose');
 // binary switch - enable return button
 const returnButtonEnabled = config.get('defaults.return-button');
 
+// binary switch - enable group confirmation message
+const confirmationEnabled = config.get('defaults.confirmation');
+
 // load monitoring configuration object
 const monitoring = config.get('monitoring');
 
@@ -128,9 +131,11 @@ bot.on('/sitrep', msg => {
     }
     let subscribedServices = monitoring.service[chatId];
 
-    // send confirmation to the initial group
-    messagePublic = ifString["public_confirm"][ defaultLang ].replace(/USERNAME/g, callName );
-    bot.sendMessage( chatId, messagePublic, {replyToMessage, parseMode});
+    // send confirmation to the initial group if needed
+    if (confirmationEnabled) { 
+    	messagePublic = ifString["public_confirm"][ defaultLang ].replace(/USERNAME/g, callName );
+    	bot.sendMessage( chatId, messagePublic, {replyToMessage, parseMode});
+    };
 
     replyMarkup = bot.inlineKeyboard( generateOptions(subscribedServices, newSessionKey), { once: true } );
 

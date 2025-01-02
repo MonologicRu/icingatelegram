@@ -22,6 +22,7 @@
     "defaults": {
         "verbose": 0,
         "return-button": 0,
+	"confirmation": 1,
         "defaultLang": "ru"
     },
     "monitoring": {
