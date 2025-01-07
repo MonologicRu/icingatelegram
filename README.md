@@ -1,10 +1,11 @@
-![Interactive Telegram bot as Icinga monitoring frontend](/img/icingatelegram-head.jpg?raw=true "icingatelegram - TG monitoring front-end")
+### Presenting at IcingaSummit'24.
+[![Interactive Telegram bot as Icinga monitoring frontend - Presenting at IcingaSummit'24](img/youtube-cover.png)](http://www.youtube.com/watch?v=uCQ-GEtN7hg "Icingatelegram at IcingaSummit'24")
 
 [![icingatelegram-1.0](https://img.shields.io/badge/dev-icingatelegram_1.0-7a00b9)](https://github.com/xyhtac/icingatelegram/releases/tag/v.1.0)
 
+
 ### Abstract.
 The [icingaweb](https://icinga.com/docs/icinga-web/latest/) front-end is powerful, but not exactly user-friendly. In our quest for a simpler solution, we explored various approaches to deliver system statuses seamlessly to both web and mobile applications, but we always stumbled over access management. Our customers weren’t thrilled to install yet another app and remember additional login details just to check if everything is running smoothly. So, we wanted a bridge between mobile devices and our monitoring data that didn’t involve app installations and password juggling.
-
 
 
 ### Notifications with Telegram Groups.
@@ -268,3 +269,5 @@ Guidelines for bug reports:
 A good bug report shouldn't leave others needing to chase you up for more information.
 Please try to be as detailed as possible in your report.
 Feature requests are welcome. Please look for existing ones and use GitHub's "reactions" feature to vote.
+
+![Interactive Telegram bot as Icinga monitoring frontend](/img/icingatelegram-head.jpg?raw=true "icingatelegram - TG monitoring front-end")
