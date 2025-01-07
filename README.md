@@ -2,10 +2,11 @@
 
 [![icingatelegram-1.0](https://img.shields.io/badge/dev-icingatelegram_1.0-7a00b9)](https://github.com/xyhtac/icingatelegram/releases/tag/v.1.0)
 
+
 ### Abstract.
 The [icingaweb](https://icinga.com/docs/icinga-web/latest/) front-end is powerful, but not exactly user-friendly. In our quest for a simpler solution, we explored various approaches to deliver system statuses seamlessly to both web and mobile applications, but we always stumbled over access management. Our customers weren’t thrilled to install yet another app and remember additional login details just to check if everything is running smoothly. So, we wanted a bridge between mobile devices and our monitoring data that didn’t involve app installations and password juggling.
 
-
+[![Presenting at IcingaSummit'24](http://img.youtube.com/vi/uCQ-GEtN7hg/0.jpg)](http://www.youtube.com/watch?v=uCQ-GEtN7hg "Icingatelegram at IcingaSummit'24")
 
 ### Notifications with Telegram Groups.
 Icinga notifications to the Telegram have always worked well because of the popularity of the messenger. There is a variaty of scripts for sending notifications out there, pick one of your choice. I do prefer a minimalistic [bash script](https://github.com/lazyfrosch/icinga2-telegram) by *lazyfrosch*, it is also included in this package with minor modifications. Put these files to your icinga master:
