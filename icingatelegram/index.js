@@ -30,6 +30,12 @@ const verbose = config.get('defaults.verbose');
 // binary switch - enable return button
 const returnButtonEnabled = config.get('defaults.return-button');
 
+// binary switch - enable group confirmation message
+const confirmationEnabled = config.get('defaults.confirmation');
+
+// load project configuration object
+const project = config.get('defaults.project');
+
 // load monitoring configuration object
 const monitoring = config.get('monitoring');
 
@@ -90,6 +96,18 @@ bot.on('/start', msg => {
 
 })
 
+bot.on('/about', msg => {
+    let replyMarkup = {};
+
+    // send project about message to the user
+    let message = ifString["about_message"][ defaultLang ];
+    message = message.replace(/PROJECT/g, project.name );
+    message = message.replace(/VERSION/g, project.version );
+
+    return bot.sendMessage( msg.from.id, message, {replyMarkup, parseMode});
+
+})
+
 bot.on('/sitrep', msg => {
     let chatId; let replyToMessage;
     let replyMarkup = {}; let newSessionKey;
@@ -128,9 +146,11 @@ bot.on('/sitrep', msg => {
     }
     let subscribedServices = monitoring.service[chatId];
 
-    // send confirmation to the initial group
-    messagePublic = ifString["public_confirm"][ defaultLang ].replace(/USERNAME/g, callName );
-    bot.sendMessage( chatId, messagePublic, {replyToMessage, parseMode});
+    // send confirmation to the initial group if needed
+    if (confirmationEnabled) { 
+    	messagePublic = ifString["public_confirm"][ defaultLang ].replace(/USERNAME/g, callName );
+    	bot.sendMessage( chatId, messagePublic, {replyToMessage, parseMode});
+    };
 
     replyMarkup = bot.inlineKeyboard( generateOptions(subscribedServices, newSessionKey), { once: true } );
 
@@ -171,9 +191,9 @@ bot.on(/^\/tellme_(.+)/, (msg, props) => {
     message = message.replace(/USERNAME/g, callName );
 
     return bot.sendMessage( msg.from.id, message, {replyMarkup, parseMode}).then (re => {
-		// set update message trail
-		lastMessage[sessionId] = [ msg.from.id, re.message_id ];
-	});
+	// set update message trail
+	lastMessage[sessionId] = [ msg.from.id, re.message_id ];
+    });
 
 });
 
@@ -263,6 +283,7 @@ bot.on(/^\/report_(.+)_(.+)$/, async (msg, props) => {
             pageWidget = ifString["text_page_widget"][ defaultLang ];
             pageWidget = pageWidget.replace(/PAGE/g, index.toString() );
             pageWidget = pageWidget.replace(/TOTAL/g, notificationData.length.toString() );
+	    pageWidget = pageWidget.replace(/CREDITNOTES/g, '' );
         }
         
         if ( index == notificationData.length && returnButtonEnabled) {
