@@ -33,6 +33,9 @@ const returnButtonEnabled = config.get('defaults.return-button');
 // binary switch - enable group confirmation message
 const confirmationEnabled = config.get('defaults.confirmation');
 
+// load project configuration object
+const project = config.get('defaults.project');
+
 // load monitoring configuration object
 const monitoring = config.get('monitoring');
 
@@ -88,6 +91,18 @@ bot.on('/start', msg => {
     // send hello message to the user
     let message = ifString["welcome_message"][ defaultLang ];
     message = message.replace(/USERNAME/g, callName );
+
+    return bot.sendMessage( msg.from.id, message, {replyMarkup, parseMode});
+
+})
+
+bot.on('/about', msg => {
+    let replyMarkup = {};
+
+    // send project about message to the user
+    let message = ifString["about_message"][ defaultLang ];
+    message = message.replace(/PROJECT/g, project.name );
+    message = message.replace(/VERSION/g, project.version );
 
     return bot.sendMessage( msg.from.id, message, {replyMarkup, parseMode});
 

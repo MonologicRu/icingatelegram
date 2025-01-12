@@ -91,7 +91,11 @@ pipeline {
                             "defaults": {
                                 "verbose": ${VERBOSE},
                                 "return-button": "${RETURN_BUTTON}",
-                                "defaultLang": "${LANGUAGE}"
+                                "defaultLang": "${LANGUAGE}",
+                                "project": {
+                                    "name": "Demo",
+                                    "version": "1.12"
+                                }
                             },
                             "telegram": {
                                 "host": "${API_HOST}",
